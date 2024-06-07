@@ -1,4 +1,4 @@
-module github.com/himgo/mysql/db
+module github.com/himgo/db
 
 go 1.21.5
 
