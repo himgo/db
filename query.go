@@ -266,7 +266,7 @@ func (this *Query) BuildSelectSql() (map[string]interface{}, error) {
 	if strings.Contains(this.table, "select ") {
 		table = this.table
 	} else {
-		table = GetDbTableName(this.dbname, this.table, this.dbtype)
+		table = GetDbTableName(this.dbname, this.table)
 	}
 
 	// var err error
@@ -404,7 +404,7 @@ func (this *Query) UpdateStmt() error {
 		return errors.New("参数错误，缺少条件")
 	}
 
-	dbName := GetDbTableName(this.dbname, this.table, this.dbtype)
+	dbName := GetDbTableName(this.dbname, this.table)
 
 	var sql string
 
@@ -659,7 +659,7 @@ func (this *Query) CreateStmt() error {
 		return errors.New("参数错误，没有数据表")
 	}
 
-	dbName := GetDbTableName(this.dbname, this.table, this.dbtype)
+	dbName := GetDbTableName(this.dbname, this.table)
 
 	var sql string
 
@@ -704,7 +704,7 @@ func (this *Query) DeleteStmt() error {
 		return errors.New("参数错误，缺少条件")
 	}
 
-	dbName := GetDbTableName(this.dbname, this.table, this.dbtype)
+	dbName := GetDbTableName(this.dbname, this.table)
 
 	var sql string
 
