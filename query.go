@@ -304,7 +304,7 @@ func (this *Query) BuildSelectSql() (map[string]interface{}, error) {
 			} else { //默认左连接
 				join_type = "left"
 			}
-			sql = StringJoin(sql, " ", join_type, " join ", GetDbTableName(this.dbname, joinitem[0], this.dbtype), " on ", joinitem[1])
+			sql = StringJoin(sql, " ", join_type, " join ", GetDbTableName(this.dbname, joinitem[0]), " on ", joinitem[1])
 		}
 	}
 	if len(this.where) > 0 || len(this.where_or) > 0 {
