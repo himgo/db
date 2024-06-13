@@ -11,7 +11,7 @@ import (
 /**
  * 检测表名
  */
-func GetDbTableName(dbName, table string) string {
+func GetDbTableName(dbName, table, dbtype string) string {
 
 	var ret string
 
