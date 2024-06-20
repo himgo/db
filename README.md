@@ -37,9 +37,16 @@ list,err := db.NewQuery().Db(dbname).Table(tablename).
 #### 使用Join联表查 
 ```
 jointable:=""
-list,err := db.NewQuery().Db(dbname).Table(tablename).
-	Join([]string{jointable,tablename.id=jointable.cid,"LEFT"}).
-	Where("id=?").Where("name=?").
+list,err := db.NewQuery().Db(dbname).Table(tablename).Alias("t").
+	Join([]string{jointable,t.id=jointable.cid,"LEFT"}).
+	Where("t.id=?").Where("name=?").
+	Value(1).Value("test").
+	List()
+
+
+list,err := db.NewQuery().Db(dbname).Table(tablename).Alias("t").
+	Join([]string{jointable,t.id=a.cid,"LEFT","a"}).
+	Where("t.id=?").Where("name=?").
 	Value(1).Value("test").
 	List()
 ```

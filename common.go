@@ -15,21 +15,38 @@ func GetDbTableName(dbName, table string) string {
 
 	var ret string
 
-	if strings.Contains(table, ".") {
-		ret = table
-	}
+	// if strings.Contains(table, ".") {
+	// 	ret = table
+	// }
 	if dbName != "" {
 		if strings.Contains(table, ",") {
 			arr := strings.Split(table, ",")
 			arrStrs := make([]string, 0, len(arr))
 			for _, v := range arr {
-				arrStrs = append(arrStrs, StringJoin(dbName, ".", v))
+				if strings.Contains(v, ".") {
+					arrStrs = append(arrStrs, v)
+				} else {
+					if TABLE_PREFIX != "" && !strings.Contains(v, TABLE_PREFIX) {
+						v = StringJoin(TABLE_PREFIX, v)
+					}
+					arrStrs = append(arrStrs, StringJoin(dbName, ".", v))
+				}
 			}
 			ret = strings.Join(arrStrs, ",")
 		} else {
-			ret = StringJoin(dbName, ".", table)
+			if strings.Contains(table, ".") {
+				ret = table
+			} else {
+				if TABLE_PREFIX != "" && !strings.Contains(table, TABLE_PREFIX) {
+					table = StringJoin(TABLE_PREFIX, table)
+				}
+				ret = StringJoin(dbName, ".", table)
+			}
 		}
 	} else {
+		if TABLE_PREFIX != "" && !strings.Contains(table, TABLE_PREFIX) {
+			table = StringJoin(TABLE_PREFIX, table)
+		}
 		ret = table
 	}
 

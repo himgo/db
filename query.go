@@ -18,7 +18,7 @@ type Query struct {
 	title     string
 	where     []string
 	where_or  []string
-	join      [][]string               //[["tablea as a","a.id=b.id","left"]]
+	join      [][]string               //[["tablea","a.id=b.id","left","alias"]]
 	save_data []map[string]interface{} //批量操作的数据[["title":"a","num":1,],["title":"a","num":1,]]
 	upd_field []string                 // 批量更新时需要更新的字段，为空时按除id外的字段进行更新
 	data      []string
@@ -136,8 +136,12 @@ func (this *Query) Join(join []string) *Query {
  * 2023/08/10
  * gz
  */
-func (this *Query) LeftJoin(table_name string, condition string) *Query {
-	this.join = append(this.join, []string{table_name, condition, "left"})
+func (this *Query) LeftJoin(table_name string, condition string, table_alias ...string) *Query {
+	if len(table_alias) > 0 {
+		this.join = append(this.join, []string{table_name, condition, "left", table_alias[0]})
+	} else {
+		this.join = append(this.join, []string{table_name, condition, "left"})
+	}
 	return this
 }
 
@@ -146,8 +150,12 @@ func (this *Query) LeftJoin(table_name string, condition string) *Query {
  * 2023/08/10
  * gz
  */
-func (this *Query) RightJoin(table_name string, condition string) *Query {
-	this.join = append(this.join, []string{table_name, condition, "right"})
+func (this *Query) RightJoin(table_name string, condition string, table_alias ...string) *Query {
+	if len(table_alias) > 0 {
+		this.join = append(this.join, []string{table_name, condition, "right", table_alias[0]})
+	} else {
+		this.join = append(this.join, []string{table_name, condition, "right"})
+	}
 	return this
 }
 
@@ -295,16 +303,21 @@ func (this *Query) BuildSelectSql() (map[string]interface{}, error) {
 
 	if len(this.join) > 0 {
 		join_type := "left"
+		var join_table string
 		for _, joinitem := range this.join {
 			if len(joinitem) < 2 {
 				continue
 			}
-			if len(joinitem) == 3 {
+			if len(joinitem) > 2 {
 				join_type = joinitem[2]
 			} else { //默认左连接
 				join_type = "left"
 			}
-			sql = StringJoin(sql, " ", join_type, " join ", GetDbTableName(this.dbname, joinitem[0]), " on ", joinitem[1])
+			join_table = GetDbTableName(this.dbname, joinitem[0])
+			if len(joinitem) > 3 {
+				join_table = StringJoin(join_table, " as ", joinitem[3])
+			}
+			sql = StringJoin(sql, " ", join_type, " join ", join_table, " on ", joinitem[1])
 		}
 	}
 	if len(this.where) > 0 || len(this.where_or) > 0 {

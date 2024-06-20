@@ -19,6 +19,9 @@ var SLAVER_DB *sql.DB
 // db类型,默认空，如TencentDB（腾讯）,
 var DB_PROVIDER string
 
+// 表前缀
+var TABLE_PREFIX string
+
 func Connect(DBHOST, DBUSER, DBPWD, DBNAME, DBPORT string, conns ...int) error {
 
 	var dbConnErr error
@@ -96,4 +99,10 @@ func ConnectSlaver(DBHOST, DBUSER_SLAVER, DBPWD_SLAVER, DBNAME, DBPORT string, c
 
 func CloseSlaverConn() error {
 	return SLAVER_DB.Close()
+}
+
+func SetTablePrefix(pre string) {
+	if pre != "" {
+		TABLE_PREFIX = pre
+	}
 }

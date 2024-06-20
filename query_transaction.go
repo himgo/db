@@ -140,8 +140,12 @@ func (this *TxQuery) Join(join []string) *TxQuery {
  * 2023/08/10
  * gz
  */
-func (this *TxQuery) LeftJoin(table_name string, condition string) *TxQuery {
-	this.join = append(this.join, []string{table_name, condition, "left"})
+func (this *TxQuery) LeftJoin(table_name string, condition string, table_alias ...string) *TxQuery {
+	if len(table_alias) > 0 {
+		this.join = append(this.join, []string{table_name, condition, "left", table_alias[0]})
+	} else {
+		this.join = append(this.join, []string{table_name, condition, "left"})
+	}
 	return this
 }
 
@@ -150,8 +154,12 @@ func (this *TxQuery) LeftJoin(table_name string, condition string) *TxQuery {
  * 2023/08/10
  * gz
  */
-func (this *TxQuery) RightJoin(table_name string, condition string) *TxQuery {
-	this.join = append(this.join, []string{table_name, condition, "right"})
+func (this *TxQuery) RightJoin(table_name string, condition string, table_alias ...string) *TxQuery {
+	if len(table_alias) > 0 {
+		this.join = append(this.join, []string{table_name, condition, "right", table_alias[0]})
+	} else {
+		this.join = append(this.join, []string{table_name, condition, "right"})
+	}
 	return this
 }
 func (this *TxQuery) Data(data string) *TxQuery {
@@ -221,15 +229,24 @@ func (this *TxQuery) BuildSelectSql() (map[string]interface{}, error) {
 	sql = StringJoin(sql, " from ", table)
 
 	if len(this.join) > 0 {
+		join_type := "left"
+		var join_table string
 		for _, joinitem := range this.join {
 			if len(joinitem) < 2 {
 				continue
 			}
-			if len(joinitem) == 3 {
-				sql = StringJoin(sql, " ", joinitem[2], " join ", GetDbTableName(this.dbname, joinitem[0]), " on ", joinitem[1])
+			if len(joinitem) > 2 {
+				join_type = joinitem[2]
 			} else { //默认左连接
-				sql = StringJoin(sql, " left join ", GetDbTableName(this.dbname, joinitem[0]), " on ", joinitem[1])
+				join_type = "left"
 			}
+			join_table = GetDbTableName(this.dbname, joinitem[0])
+
+			if len(joinitem) > 3 {
+				join_table = StringJoin(join_table, " as ", joinitem[3])
+			}
+			sql = StringJoin(sql, " ", join_type, " join ", join_table, " on ", joinitem[1])
+
 		}
 	}
 	if len(this.where) > 0 || len(this.where_or) > 0 {
